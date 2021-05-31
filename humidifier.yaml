@@ -54,8 +54,6 @@ action:
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'idle'
-      - condition: not
-        conditions:
           - condition: state
             entity_id: !input hvac
             attribute: 'hvac_action'
