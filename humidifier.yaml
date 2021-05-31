@@ -53,9 +53,11 @@ blueprint:
             domain: switch
 
 variables:
-  optimal_sensor: !input optimal_humidity_sensor
+  optimal_humidity_sensor: !input optimal_humidity_sensor
   current_sensor: !input current_humidity_sensor
-  dehumidifier_range: !input dehumidifier_trigger_range
+  dehumidifier_trigger_range: !input dehumidifier_trigger_range
+  humidifier_switch: !input humidifier_switch
+  dehumidifier_switch: !input dehumidifier_switch
 
 trigger:
   - platform: state
@@ -77,7 +79,7 @@ action:
             attribute: 'hvac_action'
             state: 'idle'
       - condition: template
-        value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float }}"
+        value_template: "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
 
       sequence:
         - service: switch.turn_on
@@ -92,7 +94,7 @@ action:
             attribute: 'hvac_action'
             state: 'idle'
           - condition: template
-            value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
+            value_template: "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
 
       sequence:
         - service: switch.turn_off
@@ -103,7 +105,7 @@ action:
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float + dehumidifier_range }}"
+            value_template: "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
         - service: switch.turn_on
@@ -114,7 +116,7 @@ action:
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float + dehumidifier_range }}"
+            value_template: "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
         - service: switch.turn_off
