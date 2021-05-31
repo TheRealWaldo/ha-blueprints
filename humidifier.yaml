@@ -18,23 +18,44 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
-    humidifier_switch:
-      name: Humidifier Switch
-      description: The switch to turn on when humidity is needed
+    dehumidifier_trigger_range:
+      name: Trigger Range
+      description: The difference in humidity to trigger dehumidification
+      default: 1
       selector:
-        target:
-          entity:
-            domain: switch
+        number:
+          min: 1
+          max: 25
+          step: 1
+          unit_of_measurement: '%'
+          mode: slider
     hvac:
       name: HVAC System
       description: Avoid running the humidifier if the HVAC system is idle
       selector:
         entity:
           domain: climate
+    humidifier_switch:
+      name: Humidifier Switch
+      description: The switch to turn on when humidity is needed
+      default: {}
+      selector:
+        target:
+          entity:
+            domain: switch
+    dehumidifier_switch:
+      name: De-humidifier Switch
+      description: The switch to turn on when humidity is too high
+      default: {}
+      selector:
+        target:
+          entity:
+            domain: switch
 
 variables:
   optimal_sensor: !input optimal_humidity_sensor
   current_sensor: !input current_humidity_sensor
+  dehumidifier_range: !input dehumidifier_trigger_range
 
 trigger:
   - platform: state
@@ -48,16 +69,13 @@ trigger:
 action:
   - choose:
     - conditions:
+      - conditions: "{{ humidifier_switch }}"
       - condition: not
         conditions:
           - condition: state
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'idle'
-          - condition: state
-            entity_id: !input hvac
-            attribute: 'hvac_action'
-            state: 'ventilation'
       - condition: template
         value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float }}"
 
@@ -66,19 +84,38 @@ action:
           target: !input humidifier_switch
 
     - conditions:
+      - conditions: "{{ humidifier_switch }}"
       - condition: or
         conditions:
           - condition: state
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'idle'
-          - condition: state
-            entity_id: !input hvac
-            attribute: 'hvac_action'
-            state: 'ventilation'
           - condition: template
             value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
 
       sequence:
         - service: switch.turn_off
           target: !input humidifier_switch
+
+    - conditions:
+      - conditions: "{{ dehumidifier_switch }}"
+      - condition: or
+        conditions:
+          - condition: template
+            value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float + dehumidifier_range }}"
+
+      sequence:
+        - service: switch.turn_on
+          target: !input dehumidifier_switch
+
+    - conditions:
+      - conditions: "{{ dehumidifier_switch }}"
+      - condition: or
+        conditions:
+          - condition: template
+            value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float + dehumidifier_range }}"
+
+      sequence:
+        - service: switch.turn_off
+          target: !input dehumidifier_switch
