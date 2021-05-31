@@ -54,7 +54,7 @@ blueprint:
 
 variables:
   optimal_humidity_sensor: !input optimal_humidity_sensor
-  current_sensor: !input current_humidity_sensor
+  current_humidity_sensor: !input current_humidity_sensor
   dehumidifier_trigger_range: !input dehumidifier_trigger_range
   humidifier_switch: !input humidifier_switch
   dehumidifier_switch: !input dehumidifier_switch
