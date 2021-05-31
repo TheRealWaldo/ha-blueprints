@@ -38,7 +38,7 @@ blueprint:
     humidifier_switch:
       name: Humidifier Switch
       description: The switch to turn on when humidity is needed
-      default: {}
+      default: switch.none
       selector:
         target:
           entity:
@@ -46,7 +46,7 @@ blueprint:
     dehumidifier_switch:
       name: De-humidifier Switch
       description: The switch to turn on when humidity is too high
-      default: {}
+      default: switch.none
       selector:
         target:
           entity:
@@ -71,7 +71,6 @@ trigger:
 action:
   - choose:
     - conditions:
-      - "{{ expand(humidifier_switch) | list | count > 0 }}"
       - condition: not
         conditions:
           - condition: state
@@ -85,7 +84,6 @@ action:
           target: !input humidifier_switch
 
     - conditions:
-      - "{{ expand(humidifier_switch) | list | count > 0 }}"
       - condition: or
         conditions:
           - condition: state
@@ -99,7 +97,6 @@ action:
           target: !input humidifier_switch
 
     - conditions:
-      - "{{ expand(dehumidifier_switch) | list | count > 0 }}"
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
@@ -107,7 +104,6 @@ action:
           target: !input dehumidifier_switch
 
     - conditions:
-      - "{{ expand(dehumidifier_switch) | list | count > 0 }}"
       - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
