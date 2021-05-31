@@ -23,7 +23,8 @@ blueprint:
       description: The switch to turn on when humidity is needed
       selector:
         target:
-          domain: switch
+          entity:
+            domain: switch
     hvac:
       name: HVAC System
       description: Avoid running the humidifier if the HVAC system is idle
