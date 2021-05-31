@@ -63,8 +63,7 @@ action:
 
       sequence:
         - service: switch.turn_on
-          data:
-            entity_id: !input humidifier_switch
+          target: !input humidifier_switch
 
     - conditions:
       - condition: or
@@ -82,5 +81,4 @@ action:
 
       sequence:
         - service: switch.turn_off
-          data:
-            entity_id: !input humidifier_switch
+          target: !input humidifier_switch
