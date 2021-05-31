@@ -69,7 +69,7 @@ trigger:
 action:
   - choose:
     - conditions:
-      - conditions: "{{ humidifier_switch }}"
+      - "{{ humidifier_switch }}"
       - condition: not
         conditions:
           - condition: state
@@ -84,7 +84,7 @@ action:
           target: !input humidifier_switch
 
     - conditions:
-      - conditions: "{{ humidifier_switch }}"
+      - "{{ humidifier_switch }}"
       - condition: or
         conditions:
           - condition: state
@@ -99,7 +99,7 @@ action:
           target: !input humidifier_switch
 
     - conditions:
-      - conditions: "{{ dehumidifier_switch }}"
+      - "{{ dehumidifier_switch }}"
       - condition: or
         conditions:
           - condition: template
@@ -110,7 +110,7 @@ action:
           target: !input dehumidifier_switch
 
     - conditions:
-      - conditions: "{{ dehumidifier_switch }}"
+      - "{{ dehumidifier_switch }}"
       - condition: or
         conditions:
           - condition: template
