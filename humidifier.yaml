@@ -76,8 +76,8 @@ action:
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'ventilation'
-      - condition: template
-        value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
+          - condition: template
+            value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
 
       sequence:
         - service: switch.turn_off
