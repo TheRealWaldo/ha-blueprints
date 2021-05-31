@@ -40,9 +40,11 @@ trigger:
   - platform: state
     entity_id:
       - !input optimal_humidity_sensor
-      - !input hvac
       - !input current_humidity_sensor
-
+  - platform: state
+    entity_id:
+      - !input hvac
+    attribute: 'hvac_action'
 action:
   - choose:
     - conditions:
