@@ -85,6 +85,7 @@ action:
           target: !input humidifier_switch
 
     - conditions:
+      - "{{ humidifier_switch != none }}"
       - condition: or
         conditions:
           - condition: state
@@ -92,7 +93,6 @@ action:
             attribute: 'hvac_action'
             state: 'idle'
           - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
-          - "{{ humidifier_switch != none }}"
 
       sequence:
         - service: switch.turn_off
