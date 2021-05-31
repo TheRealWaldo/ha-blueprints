@@ -98,6 +98,7 @@ action:
         - service: switch.turn_off
           target: !input humidifier_switch
 
+  - choose:
     - conditions:
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
       - "{{ dehumidifier_switch != none }}"
