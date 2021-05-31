@@ -1,0 +1,81 @@
+
+blueprint:
+  name: Humidifier Automations
+  description: Turn off/on humidifier based on humidity sensor
+  domain: automation
+  input:
+    current_humidity_sensor:
+      name: Humidity Sensor
+      description: The sensor to read the current humidity from
+      selector:
+        entity:
+          domain: sensor
+          device_class: humidity
+    optimal_humidity_sensor:
+      name: Optimal Humidity Sensor
+      description: The sensor to get the humidity setpoint from
+      selector:
+        entity:
+          domain: sensor
+          device_class: humidity
+    humidifier_switch:
+      name: Humidifier Switch
+      description: The switch to turn on when humidity is needed
+      selector:
+        entity:
+          domain: switch
+    hvac:
+      name: HVAC System
+      description: Avoid running the humidifier if the HVAC system is idle
+      selector:
+        entity:
+          domain: climate
+
+variables:
+  optimal_sensor: !input optimal_humidity_sensor
+  current_sensor: !input current_humidity_sensor
+
+trigger:
+  - platform: state
+    entity_id:
+      - !input optimal_humidity_sensor
+      - !input hvac
+      - !input current_humidity_sensor
+
+action:
+  - choose:
+    - conditions:
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: !input hvac
+            state: 'idle'
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: !input hvac
+            state: 'ventilation'
+      - condition: template
+        value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float }}"
+
+      sequence:
+        - service: switch.turn_on
+          data:
+            entity_id: !input humidifier_switch
+
+    - conditions:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: !input hvac
+            state: 'idle'
+          - condition: state
+            entity_id: !input hvac
+            state: 'ventilation'
+      - condition: template
+        value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
+
+      sequence:
+        - service: switch.turn_off
+          data:
+            entity_id: !input humidifier_switch
