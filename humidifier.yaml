@@ -22,7 +22,7 @@ blueprint:
       name: Humidifier Switch
       description: The switch to turn on when humidity is needed
       selector:
-        entity:
+        target:
           domain: switch
     hvac:
       name: HVAC System
@@ -49,11 +49,13 @@ action:
         conditions:
           - condition: state
             entity_id: !input hvac
+            attribute: 'hvac_action'
             state: 'idle'
       - condition: not
         conditions:
           - condition: state
             entity_id: !input hvac
+            attribute: 'hvac_action'
             state: 'ventilation'
       - condition: template
         value_template: "{{ states(current_sensor)|float < states(optimal_sensor)|float }}"
@@ -68,9 +70,11 @@ action:
         conditions:
           - condition: state
             entity_id: !input hvac
+            attribute: 'hvac_action'
             state: 'idle'
           - condition: state
             entity_id: !input hvac
+            attribute: 'hvac_action'
             state: 'ventilation'
       - condition: template
         value_template: "{{ states(current_sensor)|float >= states(optimal_sensor)|float }}"
