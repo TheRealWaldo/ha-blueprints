@@ -38,6 +38,7 @@ blueprint:
     humidifier_switch:
       name: Humidifier Switch
       description: The switch to turn on when humidity is needed
+      default: []
       selector:
         target:
           entity:
@@ -45,6 +46,7 @@ blueprint:
     dehumidifier_switch:
       name: De-humidifier Switch
       description: The switch to turn on when humidity is too high
+      default: []
       selector:
         target:
           entity:
