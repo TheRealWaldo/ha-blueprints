@@ -71,52 +71,44 @@ trigger:
 action:
   - choose:
     - conditions:
-      - "{{ humidifier_switch }}"
+      - "{{ expand(humidifier_switch) | list | count > 0 }}"
       - condition: not
         conditions:
           - condition: state
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'idle'
-      - condition: template
-        value_template: "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
+      - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
 
       sequence:
         - service: switch.turn_on
           target: !input humidifier_switch
 
     - conditions:
-      - "{{ humidifier_switch }}"
+      - "{{ expand(humidifier_switch) | list | count > 0 }}"
       - condition: or
         conditions:
           - condition: state
             entity_id: !input hvac
             attribute: 'hvac_action'
             state: 'idle'
-          - condition: template
-            value_template: "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
+          - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
 
       sequence:
         - service: switch.turn_off
           target: !input humidifier_switch
 
     - conditions:
-      - "{{ dehumidifier_switch }}"
-      - condition: or
-        conditions:
-          - condition: template
-            value_template: "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+      - "{{ expand(dehumidifier_switch) | list | count > 0 }}"
+      - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
         - service: switch.turn_on
           target: !input dehumidifier_switch
 
     - conditions:
-      - "{{ dehumidifier_switch }}"
-      - condition: or
-        conditions:
-          - condition: template
-            value_template: "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+      - "{{ expand(dehumidifier_switch) | list | count > 0 }}"
+      - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
         - service: switch.turn_off
