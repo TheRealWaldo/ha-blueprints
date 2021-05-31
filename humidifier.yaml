@@ -78,14 +78,14 @@ action:
             attribute: 'hvac_action'
             state: 'idle'
       - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
-      - "{{ humidifier_switch != none }}"
+      - "{{ humidifier_switch != [] }}"
 
       sequence:
         - service: switch.turn_on
           target: !input humidifier_switch
 
     - conditions:
-      - "{{ humidifier_switch != none }}"
+      - "{{ humidifier_switch != []] }}"
       - condition: or
         conditions:
           - condition: state
@@ -101,7 +101,7 @@ action:
   - choose:
     - conditions:
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
-      - "{{ dehumidifier_switch != none }}"
+      - "{{ dehumidifier_switch != [] }}"
 
       sequence:
         - service: switch.turn_on
@@ -109,7 +109,7 @@ action:
 
     - conditions:
       - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
-      - "{{ dehumidifier_switch != none }}"
+      - "{{ dehumidifier_switch != [] }}"
 
       sequence:
         - service: switch.turn_off
