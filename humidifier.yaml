@@ -1,7 +1,7 @@
-
 blueprint:
   name: Humidifier Automations
   description: Turn off/on humidifier based on humidity sensor
+  source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/humidifier.yaml
   domain: automation
   input:
     current_humidity_sensor:
@@ -59,6 +59,8 @@ variables:
   humidifier_switch: !input humidifier_switch
   dehumidifier_switch: !input dehumidifier_switch
 
+mode: restart
+
 trigger:
   - platform: state
     entity_id:
@@ -84,33 +86,44 @@ action:
         - service: switch.turn_on
           target: !input humidifier_switch
 
-    - conditions:
-      - "{{ humidifier_switch != {} }}"
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: !input hvac
-            attribute: 'hvac_action'
-            state: 'idle'
-          - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
+        - "{{ dehumidifier_switch != {} }}"
 
-      sequence:
         - service: switch.turn_off
-          target: !input humidifier_switch
+          target: !input dehumidifier_switch
 
-  - choose:
     - conditions:
-      - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
       - "{{ dehumidifier_switch != {} }}"
+      - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
         - service: switch.turn_on
           target: !input dehumidifier_switch
 
+        - "{{ humidifier_switch != {} }}"
+
+        - service: switch.turn_off
+          target: !input humidifier_switch
+
     - conditions:
-      - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+      - "{{ humidifier_switch != {} }}"
+
+      sequence:
+        - service: switch.turn_off
+          target: !input humidifier_switch
+
+        - "{{ dehumidifier_switch != {} }}"
+
+        - service: switch.turn_off
+          target: !input dehumidifier_switch
+
+    - conditions:
       - "{{ dehumidifier_switch != {} }}"
 
       sequence:
         - service: switch.turn_off
           target: !input dehumidifier_switch
+
+        - "{{ humidifier_switch != {} }}"
+
+        - service: switch.turn_off
+          target: !input humidifier_switch
