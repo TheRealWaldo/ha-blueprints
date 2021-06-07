@@ -83,12 +83,16 @@ action:
       - "{{ humidifier_switch != {} }}"
 
       sequence:
-        - service: switch.turn_on
+        - alias: Turn on humidifier
+          service: switch.turn_on
           target: !input humidifier_switch
 
-        - "{{ dehumidifier_switch != {} }}"
+        - alias: Check if dehumidifier enabled
+          condition: template
+          value_template: "{{ dehumidifier_switch != {} }}"
 
-        - service: switch.turn_off
+        - alias: Turn off dehumidifier
+          service: switch.turn_off
           target: !input dehumidifier_switch
 
     - conditions:
@@ -96,34 +100,46 @@ action:
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
-        - service: switch.turn_on
+        - alias: Turn on dehumidifier
+          service: switch.turn_on
           target: !input dehumidifier_switch
 
-        - "{{ humidifier_switch != {} }}"
+        - alias: Check if humidifier enabled
+          condition: template
+          value_template: "{{ humidifier_switch != {} }}"
 
-        - service: switch.turn_off
+        - alias: Turn off humidifier
+          service: switch.turn_off
           target: !input humidifier_switch
 
     - conditions:
       - "{{ humidifier_switch != {} }}"
 
       sequence:
-        - service: switch.turn_off
+        - alias: Turn off humidifier
+          service: switch.turn_off
           target: !input humidifier_switch
 
-        - "{{ dehumidifier_switch != {} }}"
+        - alias: Check if dehumidifier enabled
+          condition: template
+          value_template: "{{ dehumidifier_switch != {} }}"
 
-        - service: switch.turn_off
+        - alias: Turn off dehumidifier
+          service: switch.turn_off
           target: !input dehumidifier_switch
 
     - conditions:
       - "{{ dehumidifier_switch != {} }}"
 
       sequence:
-        - service: switch.turn_off
+        - alias: Turn off dehumidifier
+          service: switch.turn_off
           target: !input dehumidifier_switch
 
-        - "{{ humidifier_switch != {} }}"
+        - alias: Check if humidifier enabled
+          condition: template
+          value_template: "{{ humidifier_switch != {} }}"
 
-        - service: switch.turn_off
+        - alias: Turn off humidifier
+          service: switch.turn_off
           target: !input humidifier_switch
