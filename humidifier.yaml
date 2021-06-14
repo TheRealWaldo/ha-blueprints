@@ -59,7 +59,8 @@ variables:
   humidifier_switch: !input humidifier_switch
   dehumidifier_switch: !input dehumidifier_switch
 
-mode: restart
+mode: single
+max_exceeded: silent
 
 trigger:
   - platform: state
@@ -95,6 +96,20 @@ action:
           service: switch.turn_off
           target: !input dehumidifier_switch
 
+        - alias: Wait until the humidity increases to the optimal level
+          wait_for_trigger:
+            - platform: template
+              value_template: "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float }}"
+              for: "00:01:00"
+            - platform: state
+              entity_id:
+                - !input hvac
+              to: 'idle'
+
+        - alias: Turn off humidifier
+          service: switch.turn_off
+          target: !input humidifier_switch
+
     - conditions:
       - "{{ dehumidifier_switch != {} }}"
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
@@ -111,6 +126,16 @@ action:
         - alias: Turn off humidifier
           service: switch.turn_off
           target: !input humidifier_switch
+
+        - alias: Wait until the humidity decreases to the optimal level
+          wait_for_trigger:
+            - platform: template
+              value_template: "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+              for: "00:01:00"
+
+        - alias: Turn off dehumidifier
+          service: switch.turn_off
+          target: !input dehumidifier_switch
 
     - conditions:
       - "{{ humidifier_switch != {} }}"
@@ -143,3 +168,11 @@ action:
         - alias: Turn off humidifier
           service: switch.turn_off
           target: !input humidifier_switch
+
+  default:
+    - alias: Turn off dehumidifier
+      service: switch.turn_off
+      target: !input dehumidifier_switch
+    - alias: Turn off humidifier
+      service: switch.turn_off
+      target: !input humidifier_switch
