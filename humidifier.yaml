@@ -169,10 +169,10 @@ action:
             service: switch.turn_off
             target: !input humidifier_switch
 
-  default:
-    - alias: Turn off dehumidifier
-      service: switch.turn_off
-      target: !input dehumidifier_switch
-    - alias: Turn off humidifier
-      service: switch.turn_off
-      target: !input humidifier_switch
+    default:
+      - alias: Turn off dehumidifier
+        service: switch.turn_off
+        target: !input dehumidifier_switch
+      - alias: Turn off humidifier
+        service: switch.turn_off
+        target: !input humidifier_switch
