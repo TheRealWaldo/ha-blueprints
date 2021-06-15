@@ -18,6 +18,12 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
+    only_on_mold_warning:
+      name: Only dehumidify on mold warning?
+      description: Requires an optimal humidity sensor with a mold_warning attribute as a boolean.
+      default: false
+      selector:
+        boolean:
     dehumidifier_trigger_range:
       name: Trigger Range
       description: The difference in humidity to trigger dehumidification
@@ -52,6 +58,7 @@ variables:
   dehumidifier_trigger_range: !input dehumidifier_trigger_range
   dehumidifier_switches: !input dehumidifier_switches
   opposing_switches: !input opposing_switches
+  only_on_mold_warning: !input only_on_mold_warning
 
 mode: single
 max_exceeded: silent
@@ -67,6 +74,7 @@ action:
 
     - conditions:
       - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+      - "{{ state_attr(optimal_humidity_sensor, 'mold_warning') or not only_on_mold_warning }}"
 
       sequence:
         - alias: Turn on dehumidifiers
