@@ -1,7 +1,7 @@
 blueprint:
-  name: Humidifier Automations
-  description: Turn off/on humidifier based on humidity sensor
-  source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/humidifier.yaml
+  name: DeHumidifier Automations
+  description: Turn off/on dehumidifier based on humidity sensor
+  source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/dehumidifier.yaml
   domain: automation
   input:
     current_humidity_sensor:
@@ -18,32 +18,39 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
-    hvac:
-      name: HVAC System
-      description: Avoid running the humidifier if the HVAC system is idle
+    dehumidifier_trigger_range:
+      name: Trigger Range
+      description: The difference in humidity to trigger dehumidification
+      default: 1
       selector:
-        entity:
-          domain: climate
-    humidifier_switches:
-      name: Humidifier Switches
-      description: The switch to turn on when we call for humidification
+        number:
+          min: 1
+          max: 25
+          step: 1
+          unit_of_measurement: '%'
+          mode: slider
+    dehumidifier_switches:
+      name: De-humidifier Switches
+      description: Switches to turn on when we call for dehumidification
       selector:
         target:
           entity:
             domain: switch
     opposing_switches:
       name: Opposing Switches
-      description: Switches to turn off when we call for humidification
+      description: Switches to turn off when we call for dehumidification
       default: {}
       selector:
         target:
           entity:
             domain: switch
 
+
 variables:
   optimal_humidity_sensor: !input optimal_humidity_sensor
   current_humidity_sensor: !input current_humidity_sensor
-  humidifier_switches: !input humidifier_switches
+  dehumidifier_trigger_range: !input dehumidifier_trigger_range
+  dehumidifier_switches: !input dehumidifier_switches
   opposing_switches: !input opposing_switches
 
 mode: single
@@ -54,25 +61,17 @@ trigger:
     entity_id:
       - !input optimal_humidity_sensor
       - !input current_humidity_sensor
-  - platform: state
-    entity_id:
-      - !input hvac
-    attribute: 'hvac_action'
+
 action:
   - choose:
+
     - conditions:
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: !input hvac
-            attribute: 'hvac_action'
-            state: 'idle'
-      - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
+      - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
 
       sequence:
-        - alias: Turn on humidifiers
+        - alias: Turn on dehumidifiers
           service: switch.turn_on
-          target: !input humidifier_switches
+          target: !input dehumidifier_switches
 
         - alias: Check if opposing switches are enabled
           condition: template
@@ -83,10 +82,13 @@ action:
           target: !input opposing_switches
 
     default:
+      - alias: Wait 1 minute to avoid bouncing too quickly
+        delay:
+          minutes: 1
 
-      - alias: Turn off humidifiers
+      - alias: Turn off dehumidifier
         service: switch.turn_off
-        target: !input humidifier_switches
+        target: !input dehumidifier_switches
 
       - alias: Check if opposing switches are enabled
         condition: template
