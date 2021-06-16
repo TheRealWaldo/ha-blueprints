@@ -35,6 +35,16 @@ blueprint:
           step: 1
           unit_of_measurement: '%'
           mode: slider
+    disable_delay:
+      name: Off Delay
+      description: Delay (in minutes) before turning off dehumidification
+      default: 1
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 1
+          mode: slider
     dehumidifier_switches:
       name: De-humidifier Switches
       description: Switches to turn on when we call for dehumidification
@@ -90,9 +100,9 @@ action:
           target: !input opposing_switches
 
     default:
-      - alias: Wait 1 minute to avoid bouncing too quickly
+      - alias: Wait x minute(s) to avoid bouncing too quickly
         delay:
-          minutes: 1
+          minutes: !input disable_delay
 
       - alias: Turn off dehumidifier
         service: switch.turn_off
