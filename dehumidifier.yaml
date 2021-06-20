@@ -70,7 +70,7 @@ variables:
   opposing_switches: !input opposing_switches
   only_on_mold_warning: !input only_on_mold_warning
 
-mode: single
+mode: restart
 max_exceeded: silent
 
 trigger:
@@ -83,7 +83,7 @@ action:
   - choose:
 
     - conditions:
-      - "{{ states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range }}"
+      - "{{ (states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range) or only_on_mold_warning }}"
       - "{{ state_attr(optimal_humidity_sensor, 'mold_warning') or not only_on_mold_warning }}"
 
       sequence:
