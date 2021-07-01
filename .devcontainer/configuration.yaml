@@ -1,0 +1,17 @@
+default_config:
+
+logger:
+  default: info
+
+# If you need to debug uncommment the line below (doc: https://www.home-assistant.io/integrations/debugpy/)
+# debugpy:
+
+homeassistant:
+  unit_system: metric
+  temperature_unit: C
+  time_zone: America/Edmonton
+  elevation: 1045
+  auth_providers:
+    - type: homeassistant
+
+

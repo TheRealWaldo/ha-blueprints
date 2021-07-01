@@ -1,23 +1,6 @@
-# An * ensures that everything will be ignored.
-*
-
-# Whitelist
-!*.yaml
-!.gitignore
-!.gitattributes
-!*.md
-!.editorconfig
-!.github/
-!.github/*
-!.github/workflows/*
-!requirements.txt
-!.vscode/
-!.vscode/settings.json
-!LICENSE
-!README.md
-
-# Ignore folders.
-.storage
-.cloud
-.google.token
-
+__pycache__
+pythonenv*
+venv
+.venv
+.coverage
+.idea
