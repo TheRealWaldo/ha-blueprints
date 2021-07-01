@@ -61,25 +61,25 @@ blueprint:
       selector:
         action:
 
-    alarm_snooze_canceled:
+    alarm_snooze_canceled_action:
       name: Alarm Snooze Cancelled Action
       default: []
       selector:
         action:
 
-    alarm_alert_start:
+    alarm_alert_start_action:
       name: Alarm Alert Start Action
       default: []
       selector:
         action:
 
-    alarm_alert_dismiss:
+    alarm_alert_dismiss_action:
       name: Alarm Alert Dismiss Action
       default: []
       selector:
         action:
 
-    alarm_skip_next:
+    alarm_skip_next_action:
       name: Alarm Skip Next Action
       default: []
       selector:
@@ -91,7 +91,7 @@ blueprint:
       selector:
         action:
 
-    show_skip_next_alarm:
+    show_skip_next_alarm_action:
       name: Show Skip Next Alarm Action
       default: []
       selector:
