@@ -1,0 +1,347 @@
+blueprint:
+  name: Sleep as Android
+  description: "Using the sleep as android mqtt integration, allows you to set actions based on Sleep as Android state."
+  domain: automation
+  source_url: https://github.com/TheRealWaldo/ha-blueprints/blob/main/blueprints/automation/TheRealWaldo/sleep_as_android.yaml
+
+  input:
+
+    sleep_as_android_sensor:
+      name: Sleep as Android sensor
+      description: The Sleep as Android sensor to use
+      selector:
+        entity:
+          domain: sleed_as_android
+
+    rem_action:
+      name: REM Action
+      default: []
+      selector:
+        action:
+
+    light_sleep_action:
+      name: Light Sleep Action
+      default: []
+      selector:
+        action:
+
+    deep_sleep_action:
+      name: Deep Sleep Action
+      default: []
+      selector:
+        action:
+
+    awake_action:
+      name: Not Awake Action
+      default: []
+      selector:
+        action:
+
+    apnea_alarm_action:
+      name: Apnea Alarm Action
+      default: []
+      selector:
+        action:
+
+    antisnoring_action:
+      name: Antisnoring Action
+      default: []
+      selector:
+        action:
+
+    not_awake_action:
+      name: Not Awake Action
+      default: []
+      selector:
+        action:
+
+    alarm_snooze_clicked_action:
+      name: Alarm Snoozed Action
+      default: []
+      selector:
+        action:
+
+    alarm_snooze_canceled:
+      name: Alarm Snooze Cancelled Action
+      default: []
+      selector:
+        action:
+
+    alarm_alert_start:
+      name: Alarm Alert Start Action
+      default: []
+      selector:
+        action:
+
+    alarm_alert_dismiss:
+      name: Alarm Alert Dismiss Action
+      default: []
+      selector:
+        action:
+
+    alarm_skip_next:
+      name: Alarm Skip Next Action
+      default: []
+      selector:
+        action:
+
+    sleep_tracking_stopped_action:
+      name: Sleep Tracking Stopped Action
+      default: []
+      selector:
+        action:
+
+    show_skip_next_alarm:
+      name: Show Skip Next Alarm Action
+      default: []
+      selector:
+        action:
+
+    sleep_tracking_paused_action:
+      name: Sleep Tracking Paused Action
+      default: []
+      selector:
+        action:
+
+    sleep_tracking_resumed_action:
+      name: Sleep Tracking Resumed Action
+      default: []
+      selector:
+        action:
+
+    sleep_tracking_started_action:
+      name: Sleep Tracking Started Action
+      default: []
+      selector:
+        action:
+
+    time_to_bed_alarm_alert_action:
+      name: Time To Bed Alarm Alert Action
+      default: []
+      selector:
+        action:
+
+    smart_period_action:
+      name: Smart Period Action
+      default: []
+      selector:
+        action:
+
+    before_smart_period_action:
+      name: Before Smart Period Action
+      default: []
+      selector:
+        action:
+
+    lullaby_start_action:
+      name: Lullaby Start Action
+      default: []
+      selector:
+        action:
+
+    lullaby_stop_action:
+      name: Lullaby Stop Action
+      default: []
+      selector:
+        action:
+
+    lullaby_volume_down_action:
+      name: Lullaby Volume Down Action
+      default: []
+      selector:
+        action:
+
+mode: queued
+max_exceeded: silent
+
+trigger:
+
+  - platform: state
+    entity_id: !input sleep_as_android_sensor
+
+action:
+  choose:
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'rem'
+
+      sequence: !input rem_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'sleep_tracking_started'
+
+      sequence: !input sleep_tracking_started_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'sleep_tracking_stopped'
+
+      sequence: !input sleep_tracking_stopped_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'sleep_tracking_paused'
+
+      sequence: !input sleep_tracking_paused_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'sleep_tracking_resumed'
+
+      sequence: !input sleep_tracking_resumed_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'alarm_snooze_clicked'
+
+      sequence: !input alarm_snooze_clicked_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'alarm_snooze_cancelled'
+
+      sequence: !input alarm_snooze_cancelled_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'time_to_bed_alarm_alert'
+
+      sequence: !input time_to_bed_alarm_alert_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'alarm_alert_start'
+
+      sequence: !input alarm_alert_start_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'alarm_alert_dismiss'
+
+      sequence: !input alarm_alert_dismiss_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'alarm_skip_next'
+
+      sequence: !input alarm_skip_next_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'show_skip_next_alarm'
+
+      sequence: !input show_skip_next_alarm_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'smart_period'
+
+      sequence: !input smart_period_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'before_smart_period'
+
+      sequence: !input before_smart_period_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'lullaby_start'
+
+      sequence: !input lullaby_start_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'lullaby_stop'
+
+      sequence: !input lullaby_stop_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'lullaby_volume_down'
+
+      sequence: !input lullaby_volume_down_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'deep_sleep'
+
+      sequence: !input deep_sleep_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'light_sleep'
+
+      sequence: !input light_sleep_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'awake'
+
+      sequence: !input awake_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'not_awake'
+
+      sequence: !input not_awake_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'apnea_alarm'
+
+      sequence: !input apnea_alarm_action
+
+    - conditions:
+      - condition: state
+        entity_id:
+          - !input sleep_as_android_sensor
+        state: 'antisnoring'
+
+      sequence: !input antisnoring_action
