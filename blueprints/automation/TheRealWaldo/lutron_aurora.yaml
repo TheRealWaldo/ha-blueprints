@@ -52,6 +52,7 @@ action:
             entity_id: !input light
           data:
             brightness: "{{ brightness }}"
+            transition: 0
 
     - conditions:
       - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
