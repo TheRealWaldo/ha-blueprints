@@ -30,7 +30,7 @@ blueprint:
 
   source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/blueprints/automation/TheRealWaldo/lutron_aurora.yaml
 
-mode: queued
+mode: restart
 max_exceeded: silent
 
 variables:
