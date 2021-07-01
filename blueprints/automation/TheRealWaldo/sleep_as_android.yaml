@@ -61,7 +61,7 @@ blueprint:
       selector:
         action:
 
-    alarm_snooze_canceled_action:
+    alarm_snooze_cancelled_action:
       name: Alarm Snooze Cancelled Action
       default: []
       selector:
