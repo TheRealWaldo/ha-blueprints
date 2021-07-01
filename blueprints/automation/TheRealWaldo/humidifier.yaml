@@ -57,7 +57,7 @@ trigger:
   - platform: state
     entity_id:
       - !input hvac
-    attribute: 'hvac_action'
+    attribute: "hvac_action"
 action:
   - choose:
     - conditions:
@@ -65,8 +65,8 @@ action:
         conditions:
           - condition: state
             entity_id: !input hvac
-            attribute: 'hvac_action'
-            state: 'idle'
+            attribute: "hvac_action"
+            state: "idle"
       - "{{ states(current_humidity_sensor)|float < states(optimal_humidity_sensor)|float }}"
 
       sequence:
