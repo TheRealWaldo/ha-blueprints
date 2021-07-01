@@ -21,6 +21,13 @@ blueprint:
         entity:
           domain: light
 
+    enable_circadian:
+      name: Use circadian lighting?
+      description: Turns on to specific color temperature depending on time of day
+      default: false
+      selector:
+        boolean:
+
   source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/blueprints/automation/TheRealWaldo/lutron_aurora.yaml
 
 mode: restart
@@ -28,6 +35,7 @@ max_exceeded: silent
 
 variables:
   brightness: "{{ (trigger.event.data.args[0]|int) }}"
+  enable_circadian: !input enable_circadian
 
 trigger:
   - platform: event
@@ -60,6 +68,24 @@ action:
       - condition: state
         entity_id: !input light
         state: "off"
+      - "{{ enable_circadian }}"
+
+      sequence:
+
+        - service: light.turn_on
+          target:
+            entity_id: !input light
+          data:
+            kelvin: >-
+              {% if now().hour >= 22 or now().hour <= 6 %}1200{% elif now().hour >= 19 %}1500{% else %}5000{% endif %}
+
+    - conditions:
+      - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
+      - "{{ brightness != 0 }}"
+      - condition: state
+        entity_id: !input light
+        state: "off"
+      - "{{ not enable_circadian }}"
 
       sequence:
 
