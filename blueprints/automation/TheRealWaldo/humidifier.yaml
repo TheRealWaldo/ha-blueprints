@@ -1,7 +1,7 @@
 blueprint:
   name: Humidifier Automations
   description: Turn off/on humidifier based on humidity sensor
-  source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/blueprints/automation/TheRealWaldo/humidifier.yaml
+  source_url: https://github.com/TheRealWaldo/ha-blueprints/blob/main/blueprints/automation/TheRealWaldo/humidifier.yaml
   domain: automation
   input:
     current_humidity_sensor:
