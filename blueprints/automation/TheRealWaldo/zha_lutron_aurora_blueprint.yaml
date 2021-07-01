@@ -42,12 +42,28 @@ action:
     - conditions:
       - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
       - "{{ brightness != 0 }}"
+      - condition: state
+        entity_id: !input light
+        state: "on"
 
       sequence:
+
         - service: light.turn_on
           target: !input light
           data:
             brightness: "{{ brightness }}"
+
+    - conditions:
+      - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
+      - "{{ brightness != 0 }}"
+      - condition: state
+        entity_id: !input light
+        state: "off"
+
+      sequence:
+
+        - service: light.turn_on
+          target: !input light
 
     - conditions:
       - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
