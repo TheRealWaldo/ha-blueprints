@@ -55,7 +55,8 @@ action:
 
       sequence:
 
-        - delay: 1
+        - delay:
+            milliseconds: 100
 
         - service: light.turn_on
           target:
