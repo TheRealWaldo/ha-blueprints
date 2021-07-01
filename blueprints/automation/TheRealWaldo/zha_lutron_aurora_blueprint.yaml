@@ -1,0 +1,58 @@
+blueprint:
+  name: ZHA - Lutron Aurora Dimmer
+  description: "Allows for the use of the Lutron Aurora Dimmer w/ ZHA"
+  domain: automation
+  input:
+    dimmer_switch:
+      name: Lutron Aurora Dimmer Switch
+      description: Lutron Aurora Z3-1BRL
+      selector:
+        device:
+          integration: zha
+          manufacturer: Lutron
+          model: Z3-1BRL
+          entity:
+            domain: sensor
+            device_class: battery
+    light:
+      name: Light(s)
+      description: The light(s) to control
+      selector:
+        target:
+          entity:
+            domain: light
+
+  source_url: https://github.com/TheRealWaldo/ha-humidifier/blob/main/blueprints/automation/TheRealWaldo/zha_lutron_aurora_blueprint.yaml
+
+mode: restart
+max_exceeded: silent
+
+variables:
+  brightness: "{{ (trigger.event.data.args[0]|int) }}"
+
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input dimmer_switch
+
+action:
+
+  - choose:
+    - conditions:
+      - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
+      - "{{ brightness != 0 }}"
+
+      sequence:
+        - service: light.turn_on
+          target: !input light
+          data:
+            brightness: "{{ brightness }}"
+
+    - conditions:
+      - "{{ trigger.event.data.command == 'move_to_level_with_on_off' }}"
+      - "{{ brightness == 0 }}"
+
+      sequence:
+        - service: light.turn_off
+          target: !input light
