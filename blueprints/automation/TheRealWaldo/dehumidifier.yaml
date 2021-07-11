@@ -60,7 +60,7 @@ variables:
   opposing_switches: !input opposing_switches
   only_on_mold_warning: !input only_on_mold_warning
 
-mode: restart
+mode: queued
 max_exceeded: silent
 
 trigger:
