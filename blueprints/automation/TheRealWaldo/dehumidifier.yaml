@@ -4,6 +4,7 @@ blueprint:
   source_url: https://github.com/TheRealWaldo/ha-blueprints/blob/main/blueprints/automation/TheRealWaldo/dehumidifier.yaml
   domain: automation
   input:
+
     current_humidity_sensor:
       name: Humidity Sensor
       description: The sensor to read the current humidity from
@@ -11,6 +12,7 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
+
     optimal_humidity_sensor:
       name: Optimal Humidity Sensor
       description: The sensor to get the humidity setpoint from
@@ -18,23 +20,14 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
+
     only_on_mold_warning:
       name: Only dehumidify on mold warning?
       description: Requires an optimal humidity sensor with a mold_warning attribute as a boolean.
       default: false
       selector:
         boolean:
-    dehumidifier_trigger_range:
-      name: Trigger Range
-      description: The difference in humidity to trigger dehumidification
-      default: 1
-      selector:
-        number:
-          min: 1
-          max: 25
-          step: 1
-          unit_of_measurement: '%'
-          mode: slider
+
     disable_delay:
       name: Off Delay
       description: Delay (in minutes) before turning off dehumidification
@@ -45,6 +38,7 @@ blueprint:
           max: 30
           step: 1
           mode: slider
+
     dehumidifier_switches:
       name: De-humidifier Switches
       description: Switches to turn on when we call for dehumidification
@@ -52,6 +46,7 @@ blueprint:
         target:
           entity:
             domain: switch
+
     opposing_switches:
       name: Opposing Switches
       description: Switches to turn off when we call for dehumidification
@@ -61,12 +56,7 @@ blueprint:
           entity:
             domain: switch
 
-
 variables:
-  optimal_humidity_sensor: !input optimal_humidity_sensor
-  current_humidity_sensor: !input current_humidity_sensor
-  dehumidifier_trigger_range: !input dehumidifier_trigger_range
-  dehumidifier_switches: !input dehumidifier_switches
   opposing_switches: !input opposing_switches
   only_on_mold_warning: !input only_on_mold_warning
 
@@ -74,19 +64,50 @@ mode: restart
 max_exceeded: silent
 
 trigger:
+  - platform: numeric_state
+    id: "above_optimal"
+    entity_id: !input current_humidity_sensor
+    above: !input optimal_humidity_sensor
+
+  - platform: numeric_state
+    id: "below_optimal"
+    entity_id: !input current_humidity_sensor
+    below: !input optimal_humidity_sensor
+    for:
+      minutes: !input disable_delay
+
   - platform: state
-    entity_id:
-      - !input optimal_humidity_sensor
-      - !input current_humidity_sensor
+    id: "mold_warning"
+    entity_id: !input optimal_humidity_sensor
+    attribute: mold_warning
+    from: false
+    to: true
+
+  - platform: state
+    id: "mold_warning_ended"
+    entity_id: !input optimal_humidity_sensor
+    attribute: mold_warning
+    from: true
+    to: false
+    for:
+      minutes: !input disable_delay
 
 action:
   - choose:
 
     - conditions:
-      - "{{ (states(current_humidity_sensor)|float >= states(optimal_humidity_sensor)|float + dehumidifier_trigger_range) or only_on_mold_warning }}"
-      - "{{ state_attr(optimal_humidity_sensor, 'mold_warning') or not only_on_mold_warning }}"
+      - condition: or
+        conditions:
+          - condition: and
+            conditions:
+              - condition: trigger
+                id: "above_optimal"
+              - "{{ not only_on_mold_warning }}"
+          - condition: trigger
+            id: "mold_warning"
 
       sequence:
+
         - alias: Turn on dehumidifiers
           service: switch.turn_on
           target: !input dehumidifier_switches
@@ -99,19 +120,16 @@ action:
           service: switch.turn_off
           target: !input opposing_switches
 
-    default:
-      - alias: Wait x minute(s) to avoid bouncing too quickly
-        delay:
-          minutes: !input disable_delay
+    - conditions:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: "below_optimal"
+          - condition: trigger
+            id: "mold_warning_ended"
+
+      sequence:
 
       - alias: Turn off dehumidifier
         service: switch.turn_off
         target: !input dehumidifier_switches
-
-      - alias: Check if opposing switches are enabled
-        condition: template
-        value_template: "{{ opposing_switches != {} }}"
-
-      - alias: Turn off opposing_switches
-        service: switch.turn_off
-        target: !input opposing_switches
