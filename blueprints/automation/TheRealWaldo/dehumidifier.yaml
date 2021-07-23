@@ -87,7 +87,6 @@ trigger:
     id: "mold_warning_ended"
     entity_id: !input optimal_humidity_sensor
     attribute: mold_warning
-    from: true
     to: false
     for:
       minutes: !input disable_delay
