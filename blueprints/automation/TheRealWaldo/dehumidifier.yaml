@@ -124,8 +124,11 @@ action:
         conditions:
           - condition: trigger
             id: "below_optimal"
-          - condition: trigger
-            id: "mold_warning_ended"
+          - condition: and
+            conditions:
+              - condition: trigger
+                id: "mold_warning_ended"
+              - "{{ only_on_mold_warning }}"
 
       sequence:
 
